@@ -1,5 +1,7 @@
 # goanneal
 
+[![Build Status](https://travis-ci.org/matsulib/goanneal.svg?branch=master)](https://travis-ci.org/matsulib/goanneal)
+
 [Simulated annealing optimization](http://en.wikipedia.org/wiki/Simulated_annealing) in go.
 
 This package is based on a python module, [simanneal](https://github.com/perrygeo/simanneal).
