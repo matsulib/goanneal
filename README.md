@@ -15,7 +15,8 @@ This package is based on a python module, [simanneal](https://github.com/perryge
         Energy() float64   // Return the energy of the current state
     }
    ```
-   In general, Egergy() means a objective function to minimize. 
+
+   In general, Egergy() represents an objective function to minimize. 
    
 2. Get a new `Annealer` object by calling `NewAnnealer(State)`.
 3. `Annealer`'s fields, which are annealing parameters, can be changed.
@@ -108,6 +109,8 @@ The output is as follows:
 ```
  Temperature        Energy    Accept   Improve     Elapsed   Remaining
      2.50000       6845.62     6.40%     0.00%     0:00:00     0:00:00
+```
+```
 6845 mile route:
 	 New York City
 	 Philadelphia
