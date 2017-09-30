@@ -1,12 +1,13 @@
 # goanneal
 
-[Simulated annealing optimization](http://en.wikipedia.org/wiki/Simulated_annealing)in go.
+[Simulated annealing optimization](http://en.wikipedia.org/wiki/Simulated_annealing) in go.
 
 This package is based on a python module, [simanneal](https://github.com/perrygeo/simanneal).
 
 ## Usage
 
 1. Create a problem which you want to solve by implementing `State` interface.
+
     ```go
     type State interface {
         Copy() interface{} // Returns an address of an exact copy of the current state
@@ -15,6 +16,7 @@ This package is based on a python module, [simanneal](https://github.com/perryge
     }
    ```
    In general, Egergy() means a objective function to minimize. 
+   
 2. Get a new `Annealer` object by calling `NewAnnealer(State)`.
 3. `Annealer`'s fields, which are annealing parameters, can be changed.
 4. Execute annealing by calling `Annealer.Anneal()`.
@@ -26,7 +28,7 @@ Then you'll get an approximate solution.
 
 The quintessential discrete optimization problem is the [travelling salesman problem](http://en.wikipedia.org/wiki/Travelling_salesman_problem). 
 
-Please refer to [examples/salesman](https://github.com/matsulib/gomanneal/tree/master/examples/saleseman).
+Please refer to [examples/salesman](https://github.com/matsulib/goanneal/tree/master/examples/salseman).
 
 ### 0. Install it first
 ```
