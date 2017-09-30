@@ -4,7 +4,7 @@
 
 [Simulated annealing optimization](http://en.wikipedia.org/wiki/Simulated_annealing) in go.
 
-This package is based on a python module, [simanneal](https://github.com/perrygeo/simanneal).
+This package is totally inspired by a python module, [simanneal](https://github.com/perrygeo/simanneal).
 
 ## Usage
 
