@@ -31,7 +31,7 @@ Then you'll get an approximate solution.
 
 The quintessential discrete optimization problem is the [travelling salesman problem](http://en.wikipedia.org/wiki/Travelling_salesman_problem). 
 
-Please refer to [examples/salesman](https://github.com/matsulib/goanneal/tree/master/examples/salseman).
+Please refer to [examples/salesman](https://github.com/matsulib/goanneal/tree/master/examples/salseman) to see full code.
 
 ### 0. Install it first
 ```
