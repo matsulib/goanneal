@@ -1,7 +1,6 @@
 package goanneal
 
 import (
-	"fmt"
 	"math/rand"
 	"testing"
 )
