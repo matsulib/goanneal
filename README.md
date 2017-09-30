@@ -97,14 +97,38 @@ func (self *TravelState) Energy() float64 {
 ### 5. Output
 ```go
     ts := state.(*TravelState)
-    for ts.state[0] != "New York City" {
-        ts.state = append(ts.state[1:], ts.state[:1]...)
-    }
 
     fmt.Println(int(energy), "mile route:")
     for i := 0; i < len(ts.state); i++ {
         fmt.Println("\t", ts.state[i])
     }
+```
+
+The output is as follows:
+```
+ Temperature        Energy    Accept   Improve     Elapsed   Remaining
+     2.50000       6845.62     6.40%     0.00%     0:00:00     0:00:00
+6845 mile route:
+	 New York City
+	 Philadelphia
+	 Baltimore
+	 Charlotte
+	 Jacksonville
+	 Houston
+	 Austin
+	 San Antonio
+	 Phoenix
+	 San Diego
+	 Los Angeles
+	 San Jose
+	 San Francisco
+	 Fort Worth
+	 Dallas
+	 Memphis
+	 Indianapolis
+	 Chicago
+	 Detroit
+	 Columbus
 ```
 
 ## Annealing parameters
