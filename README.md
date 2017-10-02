@@ -2,9 +2,11 @@
 
 [![Build Status](https://travis-ci.org/matsulib/goanneal.svg?branch=master)](https://travis-ci.org/matsulib/goanneal)
 
-[Simulated annealing optimization](http://en.wikipedia.org/wiki/Simulated_annealing) in go.
+## Introduction
 
-This package is based on a python module, [simanneal](https://github.com/perrygeo/simanneal).
+goanneal is a Go package for [Simulated Annealing Optimization](http://en.wikipedia.org/wiki/Simulated_annealing).
+
+This package is totally inspired by a python module, [simanneal](https://github.com/perrygeo/simanneal).
 
 ## Usage
 
@@ -31,9 +33,9 @@ Then you'll get an approximate solution.
 
 The quintessential discrete optimization problem is the [travelling salesman problem](http://en.wikipedia.org/wiki/Travelling_salesman_problem). 
 
-Please refer to [examples/salesman](https://github.com/matsulib/goanneal/tree/master/examples/salseman).
+Please refer to [examples/salesman](https://github.com/matsulib/goanneal/tree/master/examples/salseman) to see full code.
 
-### 0. Install it first
+### 0. Install
 ```
 go get github.com/matsulib/goanneal
 ```
