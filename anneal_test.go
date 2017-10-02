@@ -5,41 +5,41 @@ import (
 	"testing"
 )
 
-var distanceMatrix map[string]DMap
+var distanceMatrix map[string]distanceMap
 
 type TravelState struct {
 	state []string
 }
 
 // Returns an address of an exact copy of the receiver's state
-func (self *TravelState) Copy() interface{} {
-	copiedState := make([]string, len(self.state))
-	copy(copiedState, self.state)
+func (ts *TravelState) Copy() interface{} {
+	copiedState := make([]string, len(ts.state))
+	copy(copiedState, ts.state)
 	return &TravelState{state: copiedState}
 }
 
 // Swaps two cities in the route.
-func (self *TravelState) Move() {
-	a := rand.Intn(len(self.state))
-	b := rand.Intn(len(self.state))
-	self.state[a], self.state[b] = self.state[b], self.state[a]
+func (ts *TravelState) Move() {
+	a := rand.Intn(len(ts.state))
+	b := rand.Intn(len(ts.state))
+	ts.state[a], ts.state[b] = ts.state[b], ts.state[a]
 }
 
 // Calculates the length of the route.
-func (self *TravelState) Energy() float64 {
+func (ts *TravelState) Energy() float64 {
 	e := 0.0
-	for i := 0; i < len(self.state); i++ {
+	for i := 0; i < len(ts.state); i++ {
 		if i == 0 {
-			e += distanceMatrix[self.state[len(self.state)-1]][self.state[0]]
+			e += distanceMatrix[ts.state[len(ts.state)-1]][ts.state[0]]
 		} else {
-			e += distanceMatrix[self.state[i-1]][self.state[i]]
+			e += distanceMatrix[ts.state[i-1]][ts.state[i]]
 		}
 	}
 	return e
 }
 
 func TestAnneal(t *testing.T) {
-	problem := NewAmerica()
+	problem := newAmerica()
 	distanceMatrix = problem.DistanceMatrix
 	// initial state, a randomly-ordered itinerary
 	initialState := &TravelState{state: problem.CitiesKeys()}
@@ -58,7 +58,7 @@ func TestAnneal(t *testing.T) {
 }
 
 func TestAuto(t *testing.T) {
-	problem := NewAmerica()
+	problem := newAmerica()
 	distanceMatrix = problem.DistanceMatrix
 	// initial state, a randomly-ordered itinerary
 	initialState := &TravelState{state: problem.CitiesKeys()}

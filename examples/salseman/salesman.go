@@ -9,51 +9,51 @@ import (
 	"github.com/matsulib/goanneal"
 )
 
-var distanceMatrix map[string]DMap
+var distanceMatrix map[string]distanceMap
 
-type TravelState struct {
+type travelState struct {
 	state []string
 }
 
 // Returns an address of an exact copy of the receiver's state
-func (self *TravelState) Copy() interface{} {
-	copiedState := make([]string, len(self.state))
-	copy(copiedState, self.state)
-	return &TravelState{state: copiedState}
+func (ts *travelState) Copy() interface{} {
+	copiedState := make([]string, len(ts.state))
+	copy(copiedState, ts.state)
+	return &travelState{state: copiedState}
 }
 
 // Swaps two cities in the route.
-func (self *TravelState) Move() {
-	a := rand.Intn(len(self.state))
-	b := rand.Intn(len(self.state))
-	self.state[a], self.state[b] = self.state[b], self.state[a]
+func (ts *travelState) Move() {
+	a := rand.Intn(len(ts.state))
+	b := rand.Intn(len(ts.state))
+	ts.state[a], ts.state[b] = ts.state[b], ts.state[a]
 }
 
 // Calculates the length of the route.
-func (self *TravelState) Energy() float64 {
+func (ts *travelState) Energy() float64 {
 	e := 0.0
-	for i := 0; i < len(self.state); i++ {
+	for i := 0; i < len(ts.state); i++ {
 		if i == 0 {
-			e += distanceMatrix[self.state[len(self.state)-1]][self.state[0]]
+			e += distanceMatrix[ts.state[len(ts.state)-1]][ts.state[0]]
 		} else {
-			e += distanceMatrix[self.state[i-1]][self.state[i]]
+			e += distanceMatrix[ts.state[i-1]][ts.state[i]]
 		}
 	}
 	return e
 }
 
 func main() {
-	problem := NewAmerica()
-	distanceMatrix = problem.DistanceMatrix
+	problem := newAmerica()
+	distanceMatrix = problem.distanceMatrix
 	// initial state, a randomly-ordered itinerary
-	initialState := &TravelState{state: problem.CitiesKeys()}
+	initialState := &travelState{state: problem.CitiesKeys()}
 	shuffle(initialState.state)
 
 	tsp := goanneal.NewAnnealer(initialState)
 	tsp.Steps = 100000
 
 	state, energy := tsp.Anneal()
-	ts := state.(*TravelState)
+	ts := state.(*travelState)
 	for ts.state[0] != "New York City" {
 		ts.state = append(ts.state[1:], ts.state[:1]...)
 	}

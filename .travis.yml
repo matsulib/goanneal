@@ -4,5 +4,4 @@ go:
   - 1.9
 
 script:
-  - go get github.com/matsulib/goanneal
-  - go test ./... -v
+  - go test -v ./...

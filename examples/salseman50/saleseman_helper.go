@@ -30,17 +30,17 @@ func distance(a [2]float64, b [2]float64) float64 {
 		math.Cos(lat1)*math.Cos(lat2)*math.Cos(lon1-lon2)) * R
 }
 
-type Tuple [2]float64
-type DMap map[string]float64
+type tuple [2]float64
+type distanceMap map[string]float64
 
-type America struct {
-	Cities         map[string]Tuple
-	DistanceMatrix map[string]DMap
+type america struct {
+	cities         map[string]tuple
+	distanceMatrix map[string]distanceMap
 }
 
-func NewAmerica() *America {
-	a := new(America)
-	a.Cities = map[string]Tuple{
+func newAmerica() *america {
+	a := new(america)
+	a.cities = map[string]tuple{
 		"Grand Canyon, AZ":                      {36.106965, 112.112997},
 		"Bryce Canyon, UT":                      {37.593038, 112.187090},
 		"Craters of the Moon, ID":               {43.416650, 113.516650},
@@ -93,23 +93,23 @@ func NewAmerica() *America {
 		"Hoover Dam, NV":                        {36.016066, 114.737732}}
 
 	// create a distance matrix
-	a.DistanceMatrix = map[string]DMap{}
-	for ka, va := range a.Cities {
-		a.DistanceMatrix[ka] = DMap{}
-		for kb, vb := range a.Cities {
+	a.distanceMatrix = map[string]distanceMap{}
+	for ka, va := range a.cities {
+		a.distanceMatrix[ka] = distanceMap{}
+		for kb, vb := range a.cities {
 			if kb == ka {
-				a.DistanceMatrix[ka][kb] = 0.0
+				a.distanceMatrix[ka][kb] = 0.0
 			} else {
-				a.DistanceMatrix[ka][kb] = distance(va, vb)
+				a.distanceMatrix[ka][kb] = distance(va, vb)
 			}
 		}
 	}
 	return a
 }
 
-func (self *America) CitiesKeys() []string {
+func (a *america) citiesKeys() []string {
 	ks := []string{}
-	for k, _ := range self.Cities {
+	for k := range a.cities {
 		ks = append(ks, k)
 	}
 	return ks
