@@ -46,23 +46,22 @@ func main() {
 	problem := newAmerica()
 	distanceMatrix = problem.distanceMatrix
 	// initial state, a randomly-ordered itinerary
-	initialState := &travelState{state: problem.citiesKeys()}
+	initialState := &travelState{state: problem.landmarksKeys()}
 	shuffle(initialState.state)
 
 	tsp := goanneal.NewAnnealer(initialState)
 	tsp.Steps = 10000000
-	// autoSchedule := tsp.Auto(1, 2000)
-	// tsp.SetSchedule(autoSchedule)
-	// fmt.Println(tsp.Tmax, tsp.Tmin, tsp.Steps, tsp.Updates)
+	tsp.Tmin = 1.0
 
 	state, energy := tsp.Anneal()
 	ts := state.(*travelState)
-	for ts.state[0] != "Grand Canyon, AZ" {
+	for ts.state[0] != "Grand Canyon National Park, Arizona, USA" {
 		ts.state = append(ts.state[1:], ts.state[:1]...)
 	}
 
-	fmt.Println(int(energy), "mile route:")
+	fmt.Println(int(energy), "km route:")
 	for i := 0; i < len(ts.state); i++ {
 		fmt.Println("\t", ts.state[i])
 	}
+	//22493.016
 }
