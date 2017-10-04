@@ -63,5 +63,4 @@ func main() {
 	for i := 0; i < len(ts.state); i++ {
 		fmt.Println("\t", ts.state[i])
 	}
-	//22493.016
 }

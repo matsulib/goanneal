@@ -55,19 +55,7 @@ func (a *Annealer) SetSchedule(schedule map[string]float64) {
 	a.Updates = int(schedule["updates"])
 }
 
-// Wrapper for internal update.
-// If you override the self.update method,
-// you can chose to call the a.defaultUpdate method
-// from your own Annealer.
-func (a *Annealer) update(args ...interface{}) {
-	a.defaultUpdate(args[0].(int),
-		args[1].(float64),
-		args[2].(float64),
-		args[3].(float64),
-		args[4].(float64))
-}
-
-// Default update, outputs to stderr.
+// Outputs to stderr.
 // Prints the current temperature, energy, acceptance rate, improvement rate, elapsed time, and remaining time.
 // The acceptance rate indicates the percentage of moves since the last update
 // that were accepted by the Metropolis algorithm.
@@ -78,7 +66,7 @@ func (a *Annealer) update(args ...interface{}) {
 // moves that simply undid previously accepted moves that increased the energy by thermal excititation.
 // At low temperatures it will tend toward zero as the moves that can decrease the energy are exhausted and
 // moves that would increase the energy are no longer thermally accessible.
-func (a *Annealer) defaultUpdate(step int, T float64, E float64, acceptance float64, improvement float64) {
+func (a *Annealer) update(step int, T float64, E float64, acceptance float64, improvement float64) {
 	elapsed := now() - a.start
 	if step == 0 {
 		fmt.Fprintln(os.Stderr, " Temperature        Energy    Accept   Improve     Elapsed   Remaining")
