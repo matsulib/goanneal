@@ -30,14 +30,14 @@ type Annealer struct {
 	UserExit     bool
 
 	// placeholders
-	State      interface{}
-	bestState  interface{}
+	State      State
+	bestState  State
 	bestEnergy float64
 	start      float64
 }
 
 // NewAnnealer initializes an Annealer struct
-func NewAnnealer(initialState interface{}) *Annealer {
+func NewAnnealer(initialState State) *Annealer {
 	a := new(Annealer)
 	a.State = initialState
 	a.Tmax = 25000.0
@@ -94,12 +94,11 @@ func (a *Annealer) Anneal() (interface{}, float64) {
 	Tfactor := -math.Log(a.Tmax / a.Tmin)
 
 	// Note initial state
-	currentState := a.State.(State)
 	T := a.Tmax
-	E := currentState.Energy()
-	prevState := currentState.Copy()
+	E := a.State.Energy()
+	prevState := a.State.Copy().(State)
 	prevEnergy := E
-	a.bestState = currentState.Copy()
+	a.bestState = a.State.Copy().(State)
 	a.bestEnergy = E
 	traials, accepts, imporoves := 0, 0.0, 0.0
 	var updateWavelength float64
@@ -113,13 +112,13 @@ func (a *Annealer) Anneal() (interface{}, float64) {
 		//time.Sleep(100 * time.Millisecond)
 		step++
 		T = a.Tmax * math.Exp(Tfactor*float64(step)/float64(a.Steps))
-		currentState.Move()
-		E := currentState.Energy()
+		a.State.Move()
+		E := a.State.Energy()
 		dE := E - prevEnergy
 		traials++
 		if dE > 0.0 && math.Exp(-dE/T) < rand.Float64() {
 			// Restore previous state
-			currentState = prevState.(State).Copy().(State)
+			a.State = prevState.Copy().(State)
 			E = prevEnergy
 		} else {
 			// Accept new state and compare to best state
@@ -127,10 +126,10 @@ func (a *Annealer) Anneal() (interface{}, float64) {
 			if dE < 0.0 {
 				imporoves += 1.0
 			}
-			prevState = currentState.Copy()
+			prevState = a.State.Copy().(State)
 			prevEnergy = E
 			if E < a.bestEnergy {
-				a.bestState = currentState.Copy()
+				a.bestState = a.State.Copy().(State)
 				a.bestEnergy = E
 			}
 		}
@@ -154,24 +153,23 @@ func (a *Annealer) Auto(minutes float64, steps int) map[string]float64 {
 	// Anneals a system at constant temperature and returns the state,
 	// energy, rate of acceptance, and rate of improvement.
 	run := func(T float64, steps int) (float64, float64, float64) {
-		currentState := a.State.(State)
-		E := currentState.Energy()
-		prevState := currentState.Copy()
+		E := a.State.Energy()
+		prevState := a.State.Copy().(State)
 		prevEnergy := E
 		accepts, improves := 0.0, 0.0
 		for i := 0; i < steps; i++ {
-			currentState.Move()
-			E = currentState.Energy()
+			a.State.Move()
+			E = a.State.Energy()
 			dE := E - prevEnergy
 			if dE > 0.0 && math.Exp(-dE/T) < rand.Float64() {
-				currentState = prevState.(State).Copy().(State)
+				a.State = prevState.Copy().(State)
 				E = prevEnergy
 			} else {
 				accepts += 1.0
 				if dE < 0.0 {
 					improves += 1.0
 				}
-				prevState = currentState.Copy()
+				prevState = a.State.Copy().(State)
 				prevEnergy = E
 			}
 		}
@@ -183,14 +181,13 @@ func (a *Annealer) Auto(minutes float64, steps int) map[string]float64 {
 
 	// Attempting automatic simulated anneal...
 	// Find an initial guess for temperature
-	currentState := a.State.(State)
 	T := 0.0
-	E := currentState.Energy()
+	E := a.State.Energy()
 	a.update(step, T, E, 0.0, 0.0)
 	for T == 0.0 {
 		step++
-		currentState.Move()
-		T = math.Abs(currentState.Energy() - E)
+		a.State.Move()
+		T = math.Abs(a.State.Energy() - E)
 	}
 
 	// Search for Tmax - a temperature that gives 98% acceptance
