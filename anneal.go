@@ -10,9 +10,12 @@ import (
 // State is an interface of a state of a problem.
 // These three methods will handle the state.
 type State interface {
-	Copy() interface{} // Returns an address of an exact copy of the current state
-	Move()             // Move to a different state
-	Energy() float64   // Return the energy of the current state
+	Backup()         // Save an exact copy of the current state to the previous state
+	Restore()        // Restore an the current state to the previous state
+	RecordBest()     // Save an exact copy of the current state to the best state
+	RememberBest()   // Restore an the current state to the best state
+	Move()           // Move to a different state
+	Energy() float64 // Return the energy of the current state
 }
 
 // Annealer performs simulated annealing by calling functions to calculate
@@ -31,9 +34,8 @@ type Annealer struct {
 
 	// placeholders
 	State      State
-	bestState  State
 	bestEnergy float64
-	start      float64
+	startTime  float64
 }
 
 // NewAnnealer initializes an Annealer struct
@@ -67,7 +69,7 @@ func (a *Annealer) SetSchedule(schedule map[string]float64) {
 // At low temperatures it will tend toward zero as the moves that can decrease the energy are exhausted and
 // moves that would increase the energy are no longer thermally accessible.
 func (a *Annealer) update(step int, T float64, E float64, acceptance float64, improvement float64) {
-	elapsed := now() - a.start
+	elapsed := now() - a.startTime
 	if step == 0 {
 		fmt.Fprintln(os.Stderr, " Temperature        Energy    Accept   Improve     Elapsed   Remaining")
 		fmt.Fprintf(os.Stderr, "\r%12.5f  %12.2f                      %s            ", T, E, timeString(elapsed))
@@ -83,9 +85,9 @@ func (a *Annealer) update(step int, T float64, E float64, acceptance float64, im
 // state : an initial arrangement of the system
 // Returns
 // (state, energy): the best state and energy found.
-func (a *Annealer) Anneal() (interface{}, float64) {
+func (a *Annealer) Anneal() {
 	step := 0
-	a.start = now()
+	a.startTime = now()
 
 	// Precompute factor for exponential cooling from Tmax to Tmin
 	if a.Tmin <= 0.0 {
@@ -96,9 +98,9 @@ func (a *Annealer) Anneal() (interface{}, float64) {
 	// Note initial state
 	T := a.Tmax
 	E := a.State.Energy()
-	prevState := a.State.Copy().(State)
+	a.State.Backup()
 	prevEnergy := E
-	a.bestState = a.State.Copy().(State)
+	a.State.RecordBest()
 	a.bestEnergy = E
 	traials, accepts, imporoves := 0, 0.0, 0.0
 	var updateWavelength float64
@@ -118,7 +120,7 @@ func (a *Annealer) Anneal() (interface{}, float64) {
 		traials++
 		if dE > 0.0 && math.Exp(-dE/T) < rand.Float64() {
 			// Restore previous state
-			a.State = prevState.Copy().(State)
+			a.State.Restore()
 			E = prevEnergy
 		} else {
 			// Accept new state and compare to best state
@@ -126,10 +128,10 @@ func (a *Annealer) Anneal() (interface{}, float64) {
 			if dE < 0.0 {
 				imporoves += 1.0
 			}
-			prevState = a.State.Copy().(State)
+			a.State.Backup()
 			prevEnergy = E
 			if E < a.bestEnergy {
-				a.bestState = a.State.Copy().(State)
+				a.State.RecordBest()
 				a.bestEnergy = E
 			}
 		}
@@ -140,10 +142,10 @@ func (a *Annealer) Anneal() (interface{}, float64) {
 			}
 		}
 	}
+	// last output
 	fmt.Fprintln(os.Stderr, "")
 
-	// Return best state and energy
-	return a.bestState, a.bestEnergy
+	a.State.RememberBest()
 }
 
 // Auto explores the annealing landscape and estimates optimal temperature settings.
@@ -154,7 +156,7 @@ func (a *Annealer) Auto(minutes float64, steps int) map[string]float64 {
 	// energy, rate of acceptance, and rate of improvement.
 	run := func(T float64, steps int) (float64, float64, float64) {
 		E := a.State.Energy()
-		prevState := a.State.Copy().(State)
+		a.State.Backup()
 		prevEnergy := E
 		accepts, improves := 0.0, 0.0
 		for i := 0; i < steps; i++ {
@@ -162,14 +164,14 @@ func (a *Annealer) Auto(minutes float64, steps int) map[string]float64 {
 			E = a.State.Energy()
 			dE := E - prevEnergy
 			if dE > 0.0 && math.Exp(-dE/T) < rand.Float64() {
-				a.State = prevState.Copy().(State)
+				a.State.Restore()
 				E = prevEnergy
 			} else {
 				accepts += 1.0
 				if dE < 0.0 {
 					improves += 1.0
 				}
-				prevState = a.State.Copy().(State)
+				a.State.Backup()
 				prevEnergy = E
 			}
 		}
@@ -177,7 +179,7 @@ func (a *Annealer) Auto(minutes float64, steps int) map[string]float64 {
 	}
 
 	step := 0
-	a.start = now()
+	a.startTime = now()
 
 	// Attempting automatic simulated anneal...
 	// Find an initial guess for temperature
@@ -218,7 +220,7 @@ func (a *Annealer) Auto(minutes float64, steps int) map[string]float64 {
 	Tmin := T
 
 	// Calculate anneal duration
-	elapsed := now() - a.start
+	elapsed := now() - a.startTime
 	duration := roundFigure(60.0*minutes*float64(step)/elapsed, 2)
 
 	// Don't perform anneal, just return params
