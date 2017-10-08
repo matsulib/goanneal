@@ -8,14 +8,29 @@ import (
 var distanceMatrix map[string]distanceMap
 
 type TravelState struct {
-	state []string
+	state         []string
+	previousState []string
+	bestState     []string
 }
 
-// Returns an address of an exact copy of the receiver's state
-func (ts *TravelState) Copy() interface{} {
-	copiedState := make([]string, len(ts.state))
-	copy(copiedState, ts.state)
-	return &TravelState{state: copiedState}
+// Save an exact copy of the current state to the previous state
+func (ts *TravelState) Backup() {
+	copy(ts.previousState, ts.state)
+}
+
+// Restore an the current state to the previous state
+func (ts *TravelState) Restore() {
+	copy(ts.state, ts.previousState)
+}
+
+// Save an exact copy of the current state to the best state
+func (ts *TravelState) RecordBest() {
+	copy(ts.bestState, ts.state)
+}
+
+// Restore an the current state to the best state
+func (ts *TravelState) RememberBest() {
+	copy(ts.state, ts.bestState)
 }
 
 // Swaps two cities in the route.
@@ -48,8 +63,8 @@ func TestAnneal(t *testing.T) {
 	tsp := NewAnnealer(initialState)
 	tsp.Steps = 50000
 
-	state, _ := tsp.Anneal()
-	ts := state.(*TravelState)
+	tsp.Anneal()
+	ts := tsp.State.(*TravelState)
 	actual := len(ts.state)
 	expected := 20
 	if actual != expected {
@@ -61,7 +76,10 @@ func TestAuto(t *testing.T) {
 	problem := newAmerica()
 	distanceMatrix = problem.DistanceMatrix
 	// initial state, a randomly-ordered itinerary
-	initialState := &TravelState{state: problem.CitiesKeys()}
+	initialState := &TravelState{
+		state: problem.CitiesKeys(),
+		previousState: make([]string, len(problem.CitiesKeys())),
+		bestState:     make([]string, len(problem.CitiesKeys()))}
 	shuffle(initialState.state)
 
 	tsp := NewAnnealer(initialState)
