@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/matsulib/goanneal.svg?branch=master)](https://travis-ci.org/matsulib/goanneal)
 
+***Work in progress.***
+
 ## Introduction
 
 goanneal is a Go package for [Simulated Annealing Optimization](http://en.wikipedia.org/wiki/Simulated_annealing).

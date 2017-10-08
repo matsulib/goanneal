@@ -33,7 +33,7 @@ type Annealer struct {
 	State      State
 	bestState  State
 	bestEnergy float64
-	start      float64
+	startTime  float64
 }
 
 // NewAnnealer initializes an Annealer struct
@@ -67,7 +67,7 @@ func (a *Annealer) SetSchedule(schedule map[string]float64) {
 // At low temperatures it will tend toward zero as the moves that can decrease the energy are exhausted and
 // moves that would increase the energy are no longer thermally accessible.
 func (a *Annealer) update(step int, T float64, E float64, acceptance float64, improvement float64) {
-	elapsed := now() - a.start
+	elapsed := now() - a.startTime
 	if step == 0 {
 		fmt.Fprintln(os.Stderr, " Temperature        Energy    Accept   Improve     Elapsed   Remaining")
 		fmt.Fprintf(os.Stderr, "\r%12.5f  %12.2f                      %s            ", T, E, timeString(elapsed))
@@ -85,7 +85,7 @@ func (a *Annealer) update(step int, T float64, E float64, acceptance float64, im
 // (state, energy): the best state and energy found.
 func (a *Annealer) Anneal() (interface{}, float64) {
 	step := 0
-	a.start = now()
+	a.startTime = now()
 
 	// Precompute factor for exponential cooling from Tmax to Tmin
 	if a.Tmin <= 0.0 {
@@ -177,7 +177,7 @@ func (a *Annealer) Auto(minutes float64, steps int) map[string]float64 {
 	}
 
 	step := 0
-	a.start = now()
+	a.startTime = now()
 
 	// Attempting automatic simulated anneal...
 	// Find an initial guess for temperature
@@ -218,7 +218,7 @@ func (a *Annealer) Auto(minutes float64, steps int) map[string]float64 {
 	Tmin := T
 
 	// Calculate anneal duration
-	elapsed := now() - a.start
+	elapsed := now() - a.startTime
 	duration := roundFigure(60.0*minutes*float64(step)/elapsed, 2)
 
 	// Don't perform anneal, just return params
