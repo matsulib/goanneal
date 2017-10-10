@@ -109,7 +109,6 @@ func (a *Annealer) Anneal() (interface{}, float64) {
 
 	// Attempt moves to new states
 	for step < a.Steps && !a.UserExit {
-		//time.Sleep(100 * time.Millisecond)
 		step++
 		T = a.Tmax * math.Exp(Tfactor*float64(step)/float64(a.Steps))
 		a.State.Move()
