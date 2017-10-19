@@ -12,14 +12,29 @@ import (
 var distanceMatrix map[string]distanceMap
 
 type travelState struct {
-	state []string
+	state         []string
+	previousState []string
+	bestState     []string
 }
 
-// Returns an address of an exact copy of the receiver's state
-func (ts *travelState) Copy() interface{} {
-	copiedState := make([]string, len(ts.state))
-	copy(copiedState, ts.state)
-	return &travelState{state: copiedState}
+// Save an exact copy of the current state to the previous state
+func (ts *travelState) Backup() {
+	copy(ts.previousState, ts.state)
+}
+
+// Restore an the current state to the previous state
+func (ts *travelState) Restore() {
+	copy(ts.state, ts.previousState)
+}
+
+// Save an exact copy of the current state to the best state
+func (ts *travelState) RecordBest() {
+	copy(ts.bestState, ts.state)
+}
+
+// Restore an the current state to the best state
+func (ts *travelState) RememberBest() {
+	copy(ts.state, ts.bestState)
 }
 
 // Swaps two cities in the route.
@@ -52,13 +67,13 @@ func main() {
 	tsp := goanneal.NewAnnealer(initialState)
 	tsp.Steps = 100000
 
-	state, energy := tsp.Anneal()
-	ts := state.(*travelState)
+	tsp.Anneal()
+	ts := tsp.State.(*travelState)
 	for ts.state[0] != "New York City" {
 		ts.state = append(ts.state[1:], ts.state[:1]...)
 	}
 
-	fmt.Println(int(energy), "mile route:")
+	fmt.Println(int(ts.Energy()), "mile route:")
 	for i := 0; i < len(ts.state); i++ {
 		fmt.Println("\t", ts.state[i])
 	}
